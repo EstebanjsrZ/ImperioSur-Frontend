@@ -51,7 +51,7 @@ La integración de lectura funciona **en local**: la información del catálogo 
 
 Se consulta `GET /api/productos/` con `search`, `categoria`, `page` y `page_size`; las categorías se obtienen de `/api/categorias/`. El detalle devuelve IDs de categoría y marca, resueltos mediante sus endpoints de detalle. Las peticiones se cancelan al cambiar de consulta y tienen un tiempo límite. Se muestran carga, error con reintento, catálogo vacío, producto inexistente y reemplazo de imagen. No se sustituye una API caída por un catálogo inventado.
 
-Backend: [BenjaDeLauro/Cerveceria-Backend](https://github.com/BenjaDeLauro/Cerveceria-Backend), rama de prueba `feature/integracion-frontend`, que reúne autenticación y API de catálogo con CORS, búsqueda y paginación. En esta etapa faltan los flujos propios de cuenta, CRUD y pedidos del frontend, formularios con RHF/Zod, Context API, las rutas restantes y el despliegue según la consigna de Programación III.
+Backend: [BenjaDeLauro/Cerveceria-Backend](https://github.com/BenjaDeLauro/Cerveceria-Backend), rama de prueba `feature/integracion-frontend`, que reúne autenticación y API de catálogo con CORS, búsqueda y paginación. Esta rama agrega login y cuenta con RHF/Zod y Context API. Siguen pendientes el CRUD, su segundo formulario validado, las rutas restantes y el despliegue.
 
 ![Ficha con datos de Django](docs/capturas/api-detalle.jpg)
 
@@ -72,7 +72,7 @@ npm test
 npm run build
 ```
 
-Nueve pruebas de Vitest verifican filtros editoriales y el contrato de integración: parámetros, paginación de categorías, relaciones por ID, errores de red/404 y valores cero. La compilación de producción pasa. Se revisó en navegador la lectura real, filtro combinado, ausencia de resultados, detalle, producto inexistente, caída de API y modificación de precio/stock desde Django. Catálogo y detalle sin desbordamiento en móvil (390 px) y escritorio (1280 px).
+Cinco pruebas de Vitest verifican búsqueda y filtros, parámetros enviados a Django, validación del usuario, comprobación del origen y almacenamiento del token en una cookie HttpOnly. El acceso sin sesión y el cierre de sesión se verifican manualmente. Quedan previstas dos pruebas adicionales al implementar el CRUD: validación del formulario de productos y manejo de errores al guardar. La compilación de producción pasa. Se revisó en navegador la lectura real, filtro combinado, ausencia de resultados, detalle, producto inexistente, caída de API y modificación de precio/stock desde Django. Catálogo y detalle sin desbordamiento en móvil (390 px) y escritorio (1280 px).
 
 ## Git y organización
 
@@ -94,3 +94,24 @@ El recorrido es `feature/frontend` → Pull Request a `develop` → Pull Request
 | Ignacio Piñeiro | API REST, serializers y ViewSets |
 
 El frontend y las pruebas de integración corresponden al equipo. La propuesta visual y esta conexión local se registran como aportes de Esteban. Las tareas pendientes del equipo conservan su dependencia de la API y la revisión grupal.
+
+## Autenticación (feature/autenticacion)
+
+- `/login`: formulario con React Hook Form y Zod; utiliza un usuario existente del backend.
+- `/cuenta`: página protegida que verifica la sesión en el servidor y muestra el usuario con Context API. Incluye layout, carga y error propios.
+- El navegador llama a los Route Handlers `/api/auth/login`, `/api/auth/me` y `/api/auth/logout` de Next.js. Estos consultan `/api/auth/login/`, `/api/auth/me/` y `/api/auth/logout/` de Django.
+- El token se guarda en una cookie de sesión HttpOnly y SameSite=Lax (Secure en producción); no se expone al contexto ni a localStorage. Next.js envía `Authorization: Token ...` a Django. Los POST verifican el origen para impedir solicitudes cruzadas.
+- Logout revoca el token en Django y borra la cookie. Si el backend no responde, se muestra un error y se conserva la sesión para reintentar la revocación.
+- Configurar `API_URL` para las peticiones del servidor; si se omite, se usa `NEXT_PUBLIC_API_URL`. En producción ambas deben apuntar a la API pública y el frontend debe servirse mediante HTTPS.
+- AuthProvider, LoginForm y AccountPanel son Client Components por su estado y eventos; la página de cuenta verifica el token como Server Component. Cada futura operación protegida debe volver a validar la sesión y los permisos en el backend.
+
+Para preparar una copia nueva: `npm ci`, copiar `.env.example` a `.env.local`, iniciar Django y ejecutar `npm run dev`. Verificar login inválido, login válido, recarga de `/cuenta`, logout y acceso directo a `/cuenta` sin sesión. Ejecutar `npm test` y `npm run build`.
+
+## Formato del código
+
+Usamos sangría de 2 espacios, etiquetas JSX anidadas en líneas separadas y un ancho orientativo de 80 caracteres. Prettier mantiene este formato sin cambiar el comportamiento de la aplicación.
+
+- `npm run format`: ordena el código de páginas, componentes y utilidades.
+- `npm run format:check`: comprueba el formato sin modificar archivos.
+
+Para leer el login, seguir este recorrido: `app/login/page.js` presenta la página; `components/login-form.js` valida y envía los campos; `components/auth-provider.js` comparte la sesión; `app/api/auth/login/route.js` consulta Django y guarda la cookie. `app/cuenta/page.js` verifica la sesión antes de mostrar la cuenta.
