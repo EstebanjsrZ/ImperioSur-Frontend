@@ -1,23 +1,39 @@
 # ImperioSur — Frontend
 
-Primera propuesta visual local de Cervecería ImperioSur, una marca de cerveza artesanal de Río Cuarto, Córdoba. Proyecto separado del backend Django, creado con Next.js App Router, React, JavaScript, Tailwind CSS y estilos propios.
+Frontend de Cervecería ImperioSur, una marca de cerveza artesanal de Río Cuarto, Córdoba. Proyecto separado del backend Django, creado con Next.js App Router, React, JavaScript, Tailwind CSS y estilos propios. El inicio, el catálogo y las fichas consumen productos de la API Django.
 
 ## Abrir en Windows
 
+Primero iniciar el backend en una terminal:
+
+```powershell
+cd "$env:USERPROFILE\Desktop\Cerveceria-EFI\Cerveceria-Backend"
+uv sync --locked
+uv run python manage.py migrate
+uv run python manage.py runserver
+```
+
+En una segunda terminal, iniciar el frontend:
+
 ```powershell
 cd "$env:USERPROFILE\Desktop\Cerveceria-EFI\ImperioSur-Frontend"
+# En una copia nueva: npm ci
+# Crear .env.local desde el ejemplo si todavía no existe:
+Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Entrar a http://127.0.0.1:3000/. Las dependencias ya están instaladas en esta PC. Para preparar una copia nueva, o reinstalar desde cero con el servidor detenido, ejecutar `npm ci` antes de `npm run dev`. Se necesita Node.js 20.9 o superior; se instaló Node.js LTS en esta PC.
+Entrar a http://127.0.0.1:3000/. Las dependencias ya están instaladas en esta PC. Para preparar una copia nueva, o reinstalar desde cero con el servidor detenido, ejecutar `npm ci` antes de `npm run dev`. Se necesita Node.js 20.9 o superior; se instaló Node.js LTS en esta PC. En `.env.local`, `NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api/` indica la API. Reiniciar Next.js al cambiar esa variable; en producción se configura antes de compilar.
+
+Opcionalmente, desde la carpeta del backend, `uv run python manage.py cargar_catalogo_demo` crea IPA, Golden y Stout sin sobrescribir registros existentes. Sus precios y stock son de prueba. Las imágenes se copian si está disponible esta carpeta de frontend junto al backend.
 
 ![Vista local de ImperioSur](docs/capturas/inicio.jpg)
 
 ## Rutas y funcionamiento
 
 - `/`: portada con carrusel de tres mensajes, controles anterior/siguiente y pausa; presentación de las variedades, esencia de la marca y origen.
-- `/cervezas`: catálogo editorial con búsqueda, filtros por estilo y recuperación cuando no hay resultados.
-- `/cervezas/ipa`, `/cervezas/golden`, `/cervezas/stout`: fichas de cada variedad ImperioSur y navegación hacia las demás.
+- `/cervezas`: catálogo de la API con búsqueda, filtros por categoría, paginación y recuperación cuando no hay resultados.
+- `/cervezas/[id]`: ficha de producto con descripción, imagen, precio y stock de Django. Los antiguos enlaces por estilo de la portada resuelven la ficha de la API cuando existe.
 - Menú adaptable en móvil, cierre mediante Escape, enlaces internos y página 404.
 
 ## Animaciones
@@ -31,15 +47,21 @@ Entrar a http://127.0.0.1:3000/. Las dependencias ya están instaladas en esta P
 
 ## Alcance de esta versión
 
-Esta entrega sirve para revisar el diseño y las animaciones **en local**. Las tres variedades son contenido editorial de demostración: no se simulan ventas, stock, precios, pagos ni pedidos reales. Las fotografías y etiquetas son ilustrativas.
+La integración de lectura funciona **en local**: la información del catálogo viene de la base de datos Django, incluyendo precios, stock e imágenes. Los tres productos cargados con el comando demo son datos de prueba; las fotografías y etiquetas son ilustrativas. La portada conserva textos editoriales de la marca.
 
-La conexión con la API de Django y los flujos de cuenta, gestión y pedidos se integrarán después de aprobar la propuesta visual y coordinar la consigna de Programación III. El backend existente se conserva en la carpeta vecina `Cerveceria-Backend`. No se modificó ni publicó el backend para crear esta propuesta.
+Se consulta `GET /api/productos/` con `search`, `categoria`, `page` y `page_size`; las categorías se obtienen de `/api/categorias/`. El detalle devuelve IDs de categoría y marca, resueltos mediante sus endpoints de detalle. Las peticiones se cancelan al cambiar de consulta y tienen un tiempo límite. Se muestran carga, error con reintento, catálogo vacío, producto inexistente y reemplazo de imagen. No se sustituye una API caída por un catálogo inventado.
+
+Backend: [BenjaDeLauro/Cerveceria-Backend](https://github.com/BenjaDeLauro/Cerveceria-Backend), rama de prueba `feature/integracion-frontend`, que reúne autenticación y API de catálogo con CORS, búsqueda y paginación. En esta etapa faltan los flujos propios de cuenta, CRUD y pedidos del frontend, formularios con RHF/Zod, Context API, las rutas restantes y el despliegue según la consigna de Programación III.
+
+![Ficha con datos de Django](docs/capturas/api-detalle.jpg)
 
 ## Archivos
 
 - `app/`: páginas, layout y estilos globales.
 - `components/`: marca, menú, portada, tarjetas, catálogo y efectos.
 - `lib/cervezas.js`: contenido editorial y búsqueda.
+- `lib/api.js`: contrato y peticiones a Django.
+- `lib/productos.js`: presentación de productos y moneda argentina.
 - `public/images/`: portada y etiquetas originales de ImperioSur.
 - `docs/imagenes.md`: procedencia y prompts de las imágenes.
 
@@ -50,14 +72,25 @@ npm test
 npm run build
 ```
 
-Se agregaron cuatro pruebas con Vitest para filtros combinados, normalización, búsquedas sin coincidencias y resolución de rutas de variedades. Además se revisan los recorridos en navegador.
+Nueve pruebas de Vitest verifican filtros editoriales y el contrato de integración: parámetros, paginación de categorías, relaciones por ID, errores de red/404 y valores cero. La compilación de producción pasa. Se revisó en navegador la lectura real, filtro combinado, ausencia de resultados, detalle, producto inexistente, caída de API y modificación de precio/stock desde Django. Catálogo y detalle sin desbordamiento en móvil (390 px) y escritorio (1280 px).
 
 ## Git y organización
 
 Repositorio: [EstebanjsrZ/ImperioSur-Frontend](https://github.com/EstebanjsrZ/ImperioSur-Frontend).
 
 - `feature/frontend`: diseño inicial, animaciones, variedades y pruebas.
+- `feature/integracion-api`: lectura del catálogo Django, parte de `feature/frontend` mientras se revisa su PR.
 - `develop`: integración y revisión del trabajo del frontend.
 - `main`: versión final revisada.
 
-El recorrido es `feature/frontend` → Pull Request a `develop` → Pull Request a `main`. La página se ejecuta localmente en esta etapa; la integración de datos reales y los requisitos restantes de Programación III se completarán en las siguientes tareas.
+El recorrido es `feature/frontend` → Pull Request a `develop` → Pull Request a `main`. El PR de integración depende del de diseño y debe cambiar su base a `develop` cuando se integre el diseño. Tablero: [EFI 2026 - Programación III - ImperioSur](https://github.com/users/EstebanjsrZ/projects/1).
+
+## Integrantes y división acordada
+
+| Integrante | Responsabilidad acordada del backend |
+| --- | --- |
+| Benjamín De Lauro | Estructura, coordinación e integración general |
+| Esteban Rodríguez | Autenticación, templates y permisos; ampliación de modelos |
+| Ignacio Piñeiro | API REST, serializers y ViewSets |
+
+El frontend y las pruebas de integración corresponden al equipo. La propuesta visual y esta conexión local se registran como aportes de Esteban. Las tareas pendientes del equipo conservan su dependencia de la API y la revisión grupal.
