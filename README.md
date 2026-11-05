@@ -51,7 +51,7 @@ La integración de lectura funciona **en local**: la información del catálogo 
 
 Se consulta `GET /api/productos/` con `search`, `categoria`, `page` y `page_size`; las categorías se obtienen de `/api/categorias/`. El detalle devuelve IDs de categoría y marca, resueltos mediante sus endpoints de detalle. Las peticiones se cancelan al cambiar de consulta y tienen un tiempo límite. Se muestran carga, error con reintento, catálogo vacío, producto inexistente y reemplazo de imagen. No se sustituye una API caída por un catálogo inventado.
 
-Usá la rama `main` de [ImperioSur-Backend](https://github.com/BenjaDeLauro/ImperioSur-Backend) para la API de catálogo y la autenticación. El frontend incluye login y cuenta con React Hook Form, Zod y Context API. Siguen pendientes el CRUD, su segundo formulario validado, las rutas restantes y el despliegue.
+Usá la rama `main` de [ImperioSur-Backend](https://github.com/BenjaDeLauro/ImperioSur-Backend) para la API de catálogo y la autenticación. El frontend incluye login, cuenta y gestión de productos. El despliegue sigue pendiente.
 
 ![Ficha con datos de Django](docs/capturas/api-detalle.jpg)
 
@@ -72,7 +72,13 @@ npm test
 npm run build
 ```
 
-Cinco pruebas de Vitest verifican búsqueda y filtros, parámetros enviados a Django, validación del usuario, comprobación del origen y almacenamiento del token en una cookie HttpOnly. El acceso sin sesión y el cierre de sesión se verifican manualmente. Quedan previstas dos pruebas adicionales al implementar el CRUD: validación del formulario de productos y manejo de errores al guardar. La compilación de producción pasa. Se revisó en navegador la lectura real, filtro combinado, ausencia de resultados, detalle, producto inexistente, caída de API y modificación de precio/stock desde Django. Catálogo y detalle sin desbordamiento en móvil (390 px) y escritorio (1280 px).
+Las siete pruebas de Vitest cubren búsqueda y filtros, parámetros de la API, validación del login, comprobación del origen, cookie HttpOnly, validación del formulario de productos y errores al guardar. El acceso sin sesión y el cierre de sesión se verifican manualmente.
+
+## Gestión de productos
+
+Entrá con una cuenta de Django marcada como personal (`is_staff`). Desde **Mi cuenta**, abrí **Gestionar catálogo**. En `/gestion/productos` podés listar, crear, editar y eliminar productos. El formulario de alta y edición valida con React Hook Form y Zod. Permite cargar una imagen JPG, PNG o WebP de hasta 4 MB y conserva la imagen anterior si no elegís otra.
+
+El servidor de Next.js envía el token de sesión a Django, que vuelve a comprobar los permisos en cada escritura. Si un producto está en un pedido, Django rechaza la eliminación y el frontend muestra el motivo.
 
 ## Git y organización
 
