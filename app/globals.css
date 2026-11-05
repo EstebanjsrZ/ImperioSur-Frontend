@@ -1801,3 +1801,58 @@ h3 {
     padding: 14px 18px;
   }
 }
+
+/* Cuenta y autenticación */
+.auth-page {
+  padding-top: 160px;
+  padding-bottom: 100px;
+  min-height: 75vh;
+}
+.auth-panel {
+  max-width: 520px;
+  margin: 0 auto;
+}
+.auth-panel h1 {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1.1;
+  margin: 20px 0;
+}
+.auth-panel p {
+  margin: 16px 0;
+}
+.auth-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 32px;
+}
+.auth-form label {
+  font-weight: 700;
+}
+.auth-form input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #86776d;
+  border-radius: 6px;
+  padding: 14px;
+  background: #fff;
+  color: #241b19;
+  font: inherit;
+}
+.auth-form input:focus-visible {
+  outline: 3px solid #a42b35;
+  outline-offset: 2px;
+}
+.auth-form input[aria-invalid='true'] {
+  border-color: #a42b35;
+}
+.auth-panel .auth-error {
+  color: #a0202b;
+  margin: 0 0 12px;
+}
+.auth-form button {
+  margin-top: 16px;
+}
+.auth-panel button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}

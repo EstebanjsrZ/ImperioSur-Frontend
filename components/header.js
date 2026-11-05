@@ -4,9 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Brand from './brand';
+import { useAuth } from './auth-provider';
 import { Arrow } from './icons';
 
 export default function Header() {
+  const { estado } = useAuth();
+  const cuentaHref = estado === 'autenticado' ? '/cuenta' : '/login';
+  const cuentaTexto = estado === 'autenticado' ? 'Mi cuenta' : 'Iniciar sesión';
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
   const pathname = usePathname();
@@ -46,7 +50,7 @@ export default function Header() {
           <Brand />
         </Link>
         <nav className="nav-right" aria-label="Más opciones">
-          <Link href="/#origen">RÍO CUARTO, CÓRDOBA</Link>
+          <Link href={cuentaHref}>{cuentaTexto}</Link>
           <Link className="nav-cta" href="/cervezas">
             ENCONTRÁ TU ESTILO <Arrow />
           </Link>
@@ -69,6 +73,9 @@ export default function Header() {
           className="mobile-menu"
           aria-label="Navegación móvil"
         >
+          <Link onClick={closeMenu} href={cuentaHref}>
+            {cuentaTexto} <Arrow />
+          </Link>
           <Link onClick={closeMenu} href="/cervezas">
             Nuestras cervezas <Arrow />
           </Link>
