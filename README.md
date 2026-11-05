@@ -25,7 +25,7 @@ npm run dev
 
 Entrar a http://127.0.0.1:3000/. Las dependencias ya están instaladas en esta PC. Para preparar una copia nueva, o reinstalar desde cero con el servidor detenido, ejecutar `npm ci` antes de `npm run dev`. Se necesita Node.js 20.9 o superior; se instaló Node.js LTS en esta PC. En `.env.local`, `NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api/` indica la API. Reiniciar Next.js al cambiar esa variable; en producción se configura antes de compilar.
 
-Opcionalmente, desde la carpeta del backend, `uv run python manage.py cargar_catalogo_demo` crea IPA, Golden y Stout sin sobrescribir registros existentes. Sus precios y stock son de prueba. Las imágenes se copian si está disponible esta carpeta de frontend junto al backend.
+Opcionalmente, desde la carpeta del backend, `uv run python manage.py cargar_catalogo_demo` carga las seis cervezas de muestra y sus imágenes desde Django. Conserva los datos de los productos ya existentes. Sus precios y stock son de prueba.
 
 ![Vista local de ImperioSur](docs/capturas/inicio.jpg)
 
@@ -47,11 +47,11 @@ Opcionalmente, desde la carpeta del backend, `uv run python manage.py cargar_cat
 
 ## Alcance de esta versión
 
-La integración de lectura funciona **en local**: la información del catálogo viene de la base de datos Django, incluyendo precios, stock e imágenes. Los tres productos cargados con el comando demo son datos de prueba; las fotografías y etiquetas son ilustrativas. La portada conserva textos editoriales de la marca.
+La integración de lectura funciona **en local**: la información del catálogo viene de la base de datos Django, incluyendo precios, stock e imágenes. Los productos cargados con el comando demo son datos de prueba; las fotografías y etiquetas son ilustrativas. La portada conserva textos editoriales de la marca.
 
 Se consulta `GET /api/productos/` con `search`, `categoria`, `page` y `page_size`; las categorías se obtienen de `/api/categorias/`. El detalle devuelve IDs de categoría y marca, resueltos mediante sus endpoints de detalle. Las peticiones se cancelan al cambiar de consulta y tienen un tiempo límite. Se muestran carga, error con reintento, catálogo vacío, producto inexistente y reemplazo de imagen. No se sustituye una API caída por un catálogo inventado.
 
-Backend: [BenjaDeLauro/Cerveceria-Backend](https://github.com/BenjaDeLauro/Cerveceria-Backend), rama de prueba `feature/integracion-frontend`, que reúne autenticación y API de catálogo con CORS, búsqueda y paginación. Esta rama agrega login y cuenta con RHF/Zod y Context API. Siguen pendientes el CRUD, su segundo formulario validado, las rutas restantes y el despliegue.
+Usá la rama `main` de [ImperioSur-Backend](https://github.com/BenjaDeLauro/ImperioSur-Backend) para la API de catálogo y la autenticación. El frontend incluye login y cuenta con React Hook Form, Zod y Context API. Siguen pendientes el CRUD, su segundo formulario validado, las rutas restantes y el despliegue.
 
 ![Ficha con datos de Django](docs/capturas/api-detalle.jpg)
 
@@ -78,12 +78,10 @@ Cinco pruebas de Vitest verifican búsqueda y filtros, parámetros enviados a Dj
 
 Repositorio: [EstebanjsrZ/ImperioSur-Frontend](https://github.com/EstebanjsrZ/ImperioSur-Frontend).
 
-- `feature/frontend`: diseño inicial, animaciones, variedades y pruebas.
-- `feature/integracion-api`: lectura del catálogo Django, parte de `feature/frontend` mientras se revisa su PR.
-- `develop`: integración y revisión del trabajo del frontend.
-- `main`: versión final revisada.
+- `develop` reúne los cambios de trabajo que revisa el equipo.
+- `main` contiene la versión revisada.
 
-El recorrido es `feature/frontend` → Pull Request a `develop` → Pull Request a `main`. El PR de integración depende del de diseño y debe cambiar su base a `develop` cuando se integre el diseño. Tablero: [EFI 2026 - Programación III - ImperioSur](https://github.com/users/EstebanjsrZ/projects/1).
+Para el próximo cambio, creá una rama desde `develop` y abrí un PR hacia esa rama. Cuando esté revisado, integrá `develop` a `main`. Tablero: [EFI 2026 - Programación III - ImperioSur](https://github.com/users/EstebanjsrZ/projects/1).
 
 ## Integrantes y división acordada
 
@@ -95,7 +93,7 @@ El recorrido es `feature/frontend` → Pull Request a `develop` → Pull Request
 
 El frontend y las pruebas de integración corresponden al equipo. La propuesta visual y esta conexión local se registran como aportes de Esteban. Las tareas pendientes del equipo conservan su dependencia de la API y la revisión grupal.
 
-## Autenticación (feature/autenticacion)
+## Autenticación
 
 - `/login`: formulario con React Hook Form y Zod; utiliza un usuario existente del backend.
 - `/cuenta`: página protegida que verifica la sesión en el servidor y muestra el usuario con Context API. Incluye layout, carga y error propios.
