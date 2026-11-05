@@ -10,8 +10,12 @@ export default async function CervezaPage({ params }) {
     let coincidencia;
     try {
       const pagina = await listarProductos({ busqueda: slug });
-      coincidencia = pagina.results.find((item) => item.nombre.toLowerCase().split(/\s+/).includes(slug));
-    } catch { /* El catálogo ofrece reintentar cuando la API no está disponible. */ }
+      coincidencia = pagina.results.find((item) =>
+        item.nombre.toLowerCase().split(/\s+/).includes(slug),
+      );
+    } catch {
+      /* El catálogo ofrece reintentar cuando la API no está disponible. */
+    }
     redirect(coincidencia ? `/cervezas/${coincidencia.id}` : '/cervezas');
   }
   if (!/^[1-9]\d*$/.test(slug)) notFound();

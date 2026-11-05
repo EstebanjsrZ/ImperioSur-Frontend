@@ -11,12 +11,16 @@ export default function Effects() {
     }
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (media.matches) return;
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) if (entry.isIntersecting) {
-        entry.target.setAttribute('data-visible', 'true');
-        observer.unobserve(entry.target);
-      }
-    }, { threshold: 0.12 });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries)
+          if (entry.isIntersecting) {
+            entry.target.setAttribute('data-visible', 'true');
+            observer.unobserve(entry.target);
+          }
+      },
+      { threshold: 0.12 },
+    );
     document.querySelectorAll('[data-reveal]').forEach((element) => {
       element.setAttribute('data-visible', 'false');
       observer.observe(element);
@@ -25,7 +29,10 @@ export default function Effects() {
     const onScroll = () => {
       if (frame) return;
       frame = requestAnimationFrame(() => {
-        document.documentElement.style.setProperty('--hero-shift', `${Math.min(window.scrollY * 0.18, 150)}px`);
+        document.documentElement.style.setProperty(
+          '--hero-shift',
+          `${Math.min(window.scrollY * 0.18, 150)}px`,
+        );
         frame = null;
       });
     };
