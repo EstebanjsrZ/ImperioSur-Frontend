@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { guardarProducto } from '@/app/gestion/productos/actions';
 import { imagenProducto, productoSchema } from '@/lib/producto-schema';
@@ -22,6 +22,7 @@ export default function ProductoForm({ producto, opciones }) {
   const router = useRouter();
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
@@ -30,7 +31,7 @@ export default function ProductoForm({ producto, opciones }) {
     defaultValues: {
       nombre: producto?.nombre ?? '',
       descripcion: producto?.descripcion ?? '',
-      precio: producto?.precio ?? '',
+      precio: String(producto?.precio ?? ''),
       stock: String(producto?.stock ?? 0),
       categoria: String(producto?.categoria ?? ''),
       marca: String(producto?.marca ?? ''),
@@ -79,44 +80,70 @@ export default function ProductoForm({ producto, opciones }) {
       onSubmit={handleSubmit(enviar)}
       noValidate
     >
-      {campos.map(([campo, etiqueta, tipo]) => {
-        const props = {
-          id: campo,
-          'aria-invalid': Boolean(errors[campo]),
-          'aria-describedby': errors[campo] ? `${campo}-error` : undefined,
-          ...register(campo),
-        };
-        return (
-          <div className="gestion-campo" key={campo}>
-            <label htmlFor={campo}>{etiqueta}</label>
-            {opciones[tipo] ? (
-              <select {...props} multiple={campo === 'proveedores'}>
-                {campo !== 'proveedores' && (
-                  <option value="">
-                    {campo === 'presentacion'
-                      ? 'Sin presentación'
-                      : 'Elegí una opción'}
-                  </option>
-                )}
-                {opciones[tipo].map(({ id, nombre }) => (
-                  <option key={id} value={id}>
-                    {nombre}
-                  </option>
-                ))}
-              </select>
-            ) : tipo === 'texto' ? (
-              <textarea {...props} rows={4} />
-            ) : (
-              <input {...props} inputMode={tipo} />
-            )}
-            {errors[campo] && (
-              <p id={`${campo}-error`} className="gestion-error" role="alert">
-                {errors[campo].message}
-              </p>
-            )}
-          </div>
-        );
-      })}
+      {campos.map(([campo, etiqueta, tipo]) => (
+        <div className="gestion-campo" key={campo}>
+          <label htmlFor={campo}>{etiqueta}</label>
+          <Controller
+            name={campo}
+            control={control}
+            render={({ field }) => {
+              const props = {
+                ...field,
+                id: campo,
+                'aria-invalid': Boolean(errors[campo]),
+                'aria-describedby': errors[campo]
+                  ? `${campo}-error`
+                  : undefined,
+              };
+
+              if (opciones[tipo]) {
+                const multiple = campo === 'proveedores';
+
+                return (
+                  <select
+                    {...props}
+                    multiple={multiple}
+                    onChange={(event) => {
+                      const valor = multiple
+                        ? Array.from(
+                            event.target.selectedOptions,
+                            (opcion) => opcion.value,
+                          )
+                        : event.target.value;
+
+                      field.onChange(valor);
+                    }}
+                  >
+                    {!multiple && (
+                      <option value="">
+                        {campo === 'presentacion'
+                          ? 'Sin presentación'
+                          : 'Elegí una opción'}
+                      </option>
+                    )}
+                    {opciones[tipo].map(({ id, nombre }) => (
+                      <option key={id} value={id}>
+                        {nombre}
+                      </option>
+                    ))}
+                  </select>
+                );
+              }
+
+              if (tipo === 'texto') {
+                return <textarea {...props} rows={4} />;
+              }
+
+              return <input {...props} inputMode={tipo} />;
+            }}
+          />
+          {errors[campo] && (
+            <p id={`${campo}-error`} className="gestion-error" role="alert">
+              {errors[campo].message}
+            </p>
+          )}
+        </div>
+      ))}
       <div className="gestion-campo">
         <label htmlFor="imagen">Imagen</label>
         <p id="imagen-ayuda">
@@ -125,6 +152,7 @@ export default function ProductoForm({ producto, opciones }) {
             : ''}
           JPG, PNG o WebP de hasta 4 MB.
         </p>
+        {/* El navegador gestiona el archivo; no se le asigna un value. */}
         <input
           id="imagen"
           type="file"
