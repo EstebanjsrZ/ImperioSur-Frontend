@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registroSchema } from '@/lib/registro-schema';
 import { useAuth } from './auth-provider';
@@ -42,7 +42,7 @@ export default function RegistroForm({ destino }) {
   const { registrar } = useAuth();
   const router = useRouter();
   const {
-    register,
+    control,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
@@ -71,13 +71,19 @@ export default function RegistroForm({ destino }) {
       {campos.map(({ name, label, type = 'text', autoComplete }) => (
         <div className="grid gap-2" key={name}>
           <label htmlFor={name}>{label}</label>
-          <input
-            id={name}
-            type={type}
-            autoComplete={autoComplete}
-            aria-invalid={Boolean(errors[name])}
-            aria-describedby={errors[name] ? `${name}-error` : undefined}
-            {...register(name)}
+          <Controller
+            name={name}
+            control={control}
+            render={({ field }) => (
+              <input
+                {...field}
+                id={name}
+                type={type}
+                autoComplete={autoComplete}
+                aria-invalid={Boolean(errors[name])}
+                aria-describedby={errors[name] ? `${name}-error` : undefined}
+              />
+            )}
           />
           {errors[name] && (
             <p className="auth-error" id={`${name}-error`}>

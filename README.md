@@ -54,7 +54,7 @@ La integración funciona **en local**: el catálogo, los clientes y los pedidos 
 
 Se consulta `GET /api/productos/` con `search`, `categoria`, `page` y `page_size`; las categorías se obtienen de `/api/categorias/`. El detalle devuelve IDs de categoría y marca, resueltos mediante sus endpoints de detalle. Las peticiones se cancelan al cambiar de consulta y tienen un tiempo límite. Se muestran carga, error con reintento, catálogo vacío, producto inexistente y reemplazo de imagen. No se sustituye una API caída por un catálogo inventado.
 
-Usá [Cerveceria-Backend](https://github.com/BenjaDeLauro/Cerveceria-Backend) con `POST /api/auth/registro/` habilitado.
+Usá [ImperioSur-Backend](https://github.com/BenjaDeLauro/ImperioSur-Backend) con `POST /api/auth/registro/` habilitado.
 
 ![Ficha con datos de Django](docs/capturas/api-detalle.jpg)
 
@@ -121,7 +121,7 @@ Desde **Nuestras cervezas**, agregá un producto al carrito. El navegador guarda
 
 ## Despliegue
 
-Para publicar, desplegá primero [el backend](https://github.com/BenjaDeLauro/Cerveceria-Backend) con HTTPS y almacenamiento persistente para la base de datos. Importá este repositorio como proyecto Next.js en Vercel y configurá `API_URL` y `NEXT_PUBLIC_API_URL` con la dirección pública de Django que termina en `/api/`. En Django, agregá el dominio público del frontend a `CORS_ALLOWED_ORIGINS`. Verificá el registro, el catálogo y un pedido de prueba desde el enlace público e incorporá ese enlace al README.
+Para publicar, desplegá primero [el backend](https://github.com/BenjaDeLauro/ImperioSur-Backend) con HTTPS y almacenamiento persistente para la base de datos. Importá este repositorio como proyecto Next.js en Vercel y configurá `API_URL` y `NEXT_PUBLIC_API_URL` con la dirección pública de Django que termina en `/api/`. En Django, agregá el dominio público del frontend a `CORS_ALLOWED_ORIGINS`. Verificá el registro, el catálogo y un pedido de prueba desde el enlace público e incorporá ese enlace al README.
 
 ## Formato del código
 
