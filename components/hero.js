@@ -98,8 +98,7 @@ export default function Hero() {
           fill
           loading="eager"
           fetchPriority="high"
-          sizes="(max-width: 767px) max(110vw, 880px), 110vw"
-          quality={90}
+          unoptimized
         />
       </div>
       <div className="hero-shade" />
