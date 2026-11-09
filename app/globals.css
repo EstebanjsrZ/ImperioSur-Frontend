@@ -288,8 +288,8 @@ h3 {
 }
 .hero {
   position: relative;
-  min-height: 740px;
-  height: 100svh;
+  min-height: 600px;
+  height: min(100svh, 56.25vw);
   max-height: 1100px;
   color: white;
   background: #101a15;
@@ -298,7 +298,7 @@ h3 {
 }
 .hero-landscape {
   position: absolute;
-  inset: -40px 0;
+  inset: 0;
   z-index: -3;
   transform: translateY(var(--hero-shift, 0px));
   transition: opacity 1.2s;
@@ -308,7 +308,11 @@ h3 {
   object-position: 65% center;
 }
 .hero-river .hero-landscape img {
-  animation: landscape-breath 20s ease-in-out infinite alternate;
+  transform-origin: 72% center;
+  animation: landscape-breath var(--slide-duration) ease-in-out both;
+}
+.hero-paused .hero-landscape img {
+  animation-play-state: paused;
 }
 .hero-shade {
   position: absolute;
@@ -1131,7 +1135,7 @@ h3 {
     scale: 1;
   }
   to {
-    scale: 1.06;
+    scale: 1.16;
   }
 }
 @keyframes scroll-trace {
@@ -1147,6 +1151,11 @@ h3 {
     left: calc((100vw - 1300px) / 2);
   }
 }
+@media (min-width: 851px) and (max-height: 680px) {
+  .hero-copy {
+    top: 40%;
+  }
+}
 @media (max-width: 1150px) {
   .header-inner {
     padding-left: 30px;
@@ -1158,7 +1167,7 @@ h3 {
     gap: 23px;
     font-size: 8px;
   }
-  .nav-right > a:first-child {
+  .nav-right .nav-registro {
     display: none;
   }
   .section-wrap {
@@ -1209,7 +1218,7 @@ h3 {
     justify-self: end;
   }
   .hero {
-    min-height: 700px;
+    min-height: 620px;
   }
   .hero-copy {
     left: 40px;
@@ -1397,6 +1406,17 @@ h3 {
   }
   .hero-landscape img {
     object-position: 71% center;
+  }
+  .hero-river .hero-landscape {
+    bottom: auto;
+    height: clamp(360px, 52svh, 480px);
+    mask-image: linear-gradient(black 85%, transparent);
+  }
+  .hero-river .hero-landscape img {
+    object-position: 75% center;
+  }
+  .hero-river .hero-copy {
+    top: 57%;
   }
   .hero-shade {
     background:

@@ -5,10 +5,13 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Brand from './brand';
 import { useAuth } from './auth-provider';
+import { useCarrito } from './carrito-provider';
 import { Arrow } from './icons';
 
 export default function Header() {
   const { estado } = useAuth();
+  const { totalUnidades } = useCarrito();
+  const carritoTexto = totalUnidades ? `Carrito (${totalUnidades})` : 'Carrito';
   const cuentaHref = estado === 'autenticado' ? '/cuenta' : '/login';
   const cuentaTexto = estado === 'autenticado' ? 'Mi cuenta' : 'Iniciar sesión';
   const [scrolled, setScrolled] = useState(false);
@@ -50,7 +53,13 @@ export default function Header() {
           <Brand />
         </Link>
         <nav className="nav-right" aria-label="Más opciones">
+          <Link href="/carrito">{carritoTexto}</Link>
           <Link href={cuentaHref}>{cuentaTexto}</Link>
+          {estado === 'anonimo' && (
+            <Link className="nav-registro" href="/registro">
+              Crear cuenta
+            </Link>
+          )}
           <Link className="nav-cta" href="/cervezas">
             ENCONTRÁ TU ESTILO <Arrow />
           </Link>
@@ -75,6 +84,14 @@ export default function Header() {
         >
           <Link onClick={closeMenu} href={cuentaHref}>
             {cuentaTexto} <Arrow />
+          </Link>
+          {estado === 'anonimo' && (
+            <Link onClick={closeMenu} href="/registro">
+              Crear cuenta <Arrow />
+            </Link>
+          )}
+          <Link onClick={closeMenu} href="/carrito">
+            {carritoTexto} <Arrow />
           </Link>
           <Link onClick={closeMenu} href="/cervezas">
             Nuestras cervezas <Arrow />

@@ -3,6 +3,7 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import Effects from '@/components/effects';
 import AuthProvider from '@/components/auth-provider';
+import CarritoProvider from '@/components/carrito-provider';
 
 export const metadata = {
   title: {
@@ -19,13 +20,15 @@ export default function RootLayout({ children }) {
     <html lang="es-AR">
       <body>
         <AuthProvider>
-          <a className="skip-link" href="#contenido">
-            Saltar al contenido
-          </a>
-          <Header />
-          <main id="contenido">{children}</main>
-          <Footer />
-          <Effects />
+          <CarritoProvider>
+            <a className="skip-link" href="#contenido">
+              Saltar al contenido
+            </a>
+            <Header />
+            <main id="contenido">{children}</main>
+            <Footer />
+            <Effects />
+          </CarritoProvider>
         </AuthProvider>
       </body>
     </html>

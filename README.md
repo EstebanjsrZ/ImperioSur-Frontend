@@ -34,6 +34,9 @@ Opcionalmente, desde la carpeta del backend, `uv run python manage.py cargar_cat
 - `/`: portada con carrusel de tres mensajes, controles anterior/siguiente y pausa; presentación de las variedades, esencia de la marca y origen.
 - `/cervezas`: catálogo de la API con búsqueda, filtros por categoría, paginación y recuperación cuando no hay resultados.
 - `/cervezas/[id]`: ficha de producto con descripción, imagen, precio y stock de Django. Los antiguos enlaces por estilo de la portada resuelven la ficha de la API cuando existe.
+- `/registro` y `/login`: alta de clientes e inicio de sesión con usuarios de Django.
+- `/carrito`: cantidades, disponibilidad, total estimado y confirmación de un pedido.
+- `/cuenta/pedidos`: historial protegido, paginado y limitado a los pedidos del usuario.
 - Menú adaptable en móvil, cierre mediante Escape, enlaces internos y página 404.
 
 ## Animaciones
@@ -47,11 +50,11 @@ Opcionalmente, desde la carpeta del backend, `uv run python manage.py cargar_cat
 
 ## Alcance de esta versión
 
-La integración de lectura funciona **en local**: la información del catálogo viene de la base de datos Django, incluyendo precios, stock e imágenes. Los productos cargados con el comando demo son datos de prueba; las fotografías y etiquetas son ilustrativas. La portada conserva textos editoriales de la marca.
+La integración funciona **en local**: el catálogo, los clientes y los pedidos se gestionan en Django. Los productos cargados con el comando demo son datos de prueba; las fotografías y etiquetas son ilustrativas. La portada conserva textos editoriales de la marca.
 
 Se consulta `GET /api/productos/` con `search`, `categoria`, `page` y `page_size`; las categorías se obtienen de `/api/categorias/`. El detalle devuelve IDs de categoría y marca, resueltos mediante sus endpoints de detalle. Las peticiones se cancelan al cambiar de consulta y tienen un tiempo límite. Se muestran carga, error con reintento, catálogo vacío, producto inexistente y reemplazo de imagen. No se sustituye una API caída por un catálogo inventado.
 
-Usá la rama `main` de [ImperioSur-Backend](https://github.com/BenjaDeLauro/ImperioSur-Backend) para la API de catálogo y la autenticación. El frontend incluye login y cuenta con React Hook Form, Zod y Context API. Siguen pendientes el CRUD, su segundo formulario validado, las rutas restantes y el despliegue.
+Usá [ImperioSur-Backend](https://github.com/BenjaDeLauro/ImperioSur-Backend) con `POST /api/auth/registro/` habilitado.
 
 ![Ficha con datos de Django](docs/capturas/api-detalle.jpg)
 
@@ -72,7 +75,13 @@ npm test
 npm run build
 ```
 
-Cinco pruebas de Vitest verifican búsqueda y filtros, parámetros enviados a Django, validación del usuario, comprobación del origen y almacenamiento del token en una cookie HttpOnly. El acceso sin sesión y el cierre de sesión se verifican manualmente. Quedan previstas dos pruebas adicionales al implementar el CRUD: validación del formulario de productos y manejo de errores al guardar. La compilación de producción pasa. Se revisó en navegador la lectura real, filtro combinado, ausencia de resultados, detalle, producto inexistente, caída de API y modificación de precio/stock desde Django. Catálogo y detalle sin desbordamiento en móvil (390 px) y escritorio (1280 px).
+Las siete pruebas de Vitest cubren búsqueda y filtros, parámetros de la API, validación del login, comprobación del origen, cookie HttpOnly, validación del formulario de productos y errores al guardar. El acceso sin sesión y el cierre de sesión se verifican manualmente.
+
+## Gestión de productos
+
+Entrá con una cuenta de Django marcada como personal (`is_staff`). Desde **Mi cuenta**, abrí **Gestionar catálogo**. En `/gestion/productos` podés listar, crear, editar y eliminar productos. El formulario de alta y edición valida con React Hook Form y Zod. Permite cargar una imagen JPG, PNG o WebP de hasta 4 MB y conserva la imagen anterior si no elegís otra.
+
+El servidor de Next.js envía el token de sesión a Django, que vuelve a comprobar los permisos en cada escritura. Si un producto está en un pedido, Django rechaza la eliminación y el frontend muestra el motivo.
 
 ## Git y organización
 
@@ -96,6 +105,7 @@ El frontend y las pruebas de integración corresponden al equipo. La propuesta v
 ## Autenticación
 
 - `/login`: formulario con React Hook Form y Zod; utiliza un usuario existente del backend.
+- `/registro`: formulario con React Hook Form y Zod. Django aplica sus validaciones, crea al usuario en el grupo Clientes e inicia sesión con el mismo token que en el login.
 - `/cuenta`: página protegida que verifica la sesión en el servidor y muestra el usuario con Context API. Incluye layout, carga y error propios.
 - El navegador llama a los Route Handlers `/api/auth/login`, `/api/auth/me` y `/api/auth/logout` de Next.js. Estos consultan `/api/auth/login/`, `/api/auth/me/` y `/api/auth/logout/` de Django.
 - El token se guarda en una cookie de sesión HttpOnly y SameSite=Lax (Secure en producción); no se expone al contexto ni a localStorage. Next.js envía `Authorization: Token ...` a Django. Los POST verifican el origen para impedir solicitudes cruzadas.
@@ -104,6 +114,14 @@ El frontend y las pruebas de integración corresponden al equipo. La propuesta v
 - AuthProvider, LoginForm y AccountPanel son Client Components por su estado y eventos; la página de cuenta verifica el token como Server Component. Cada futura operación protegida debe volver a validar la sesión y los permisos en el backend.
 
 Para preparar una copia nueva: `npm ci`, copiar `.env.example` a `.env.local`, iniciar Django y ejecutar `npm run dev`. Verificar login inválido, login válido, recarga de `/cuenta`, logout y acceso directo a `/cuenta` sin sesión. Ejecutar `npm test` y `npm run build`.
+
+## Compras
+
+Desde **Nuestras cervezas**, agregá un producto al carrito. El navegador guarda los IDs y las cantidades para que el carrito se mantenga si recargás o iniciás sesión. El carrito consulta el precio y el stock en la API. Al confirmar, Django asocia el pedido con el cliente, vuelve a validar las cantidades y descuenta el stock en la misma operación. **Mis pedidos** muestra el resultado guardado.
+
+## Despliegue
+
+Para publicar, desplegá primero [el backend](https://github.com/BenjaDeLauro/ImperioSur-Backend) con HTTPS y almacenamiento persistente para la base de datos. Importá este repositorio como proyecto Next.js en Vercel y configurá `API_URL` y `NEXT_PUBLIC_API_URL` con la dirección pública de Django que termina en `/api/`. En Django, agregá el dominio público del frontend a `CORS_ALLOWED_ORIGINS`. Verificá el registro, el catálogo y un pedido de prueba desde el enlace público e incorporá ese enlace al README.
 
 ## Formato del código
 

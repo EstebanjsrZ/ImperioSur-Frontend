@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from './auth-provider';
 
-export default function AccountPanel() {
+export default function AccountPanel({ puedeGestionar }) {
   const { usuario, estado, error, verificar, salir } = useAuth();
   const router = useRouter();
   const [cerrando, setCerrando] = useState(false);
@@ -49,6 +50,18 @@ export default function AccountPanel() {
       <h1>MI CUENTA</h1>
       <p>Hola, {usuario.nombre || usuario.username}.</p>
       <p>Tu sesión está activa.</p>
+      <p>
+        <Link className="button button-outline" href="/cuenta/pedidos">
+          Mis pedidos
+        </Link>
+      </p>
+      {puedeGestionar && (
+        <p>
+          <Link className="button button-outline" href="/gestion">
+            Gestionar catálogo
+          </Link>
+        </p>
+      )}
       {errorSalida && (
         <p className="auth-error" role="alert">
           {errorSalida}

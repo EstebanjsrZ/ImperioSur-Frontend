@@ -35,12 +35,18 @@ const slides = [
   },
 ];
 
+const SLIDE_SECONDS = 10;
+
 export default function Hero() {
-  const [active, setActive] = useState(0);
+  const [{ active }, setPlayback] = useState({
+    active: 0,
+    secondsLeft: SLIDE_SECONDS,
+  });
   const [paused, setPaused] = useState(false);
-  const [hover, setHover] = useState(false);
   const [reduced, setReduced] = useState(true);
+  const [visible, setVisible] = useState(true);
   const slide = slides[active];
+  const playing = !paused && !reduced && visible;
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -51,31 +57,48 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    if (paused || hover || reduced) return;
+    const update = () => setVisible(!document.hidden);
+    update();
+    document.addEventListener('visibilitychange', update);
+    return () => document.removeEventListener('visibilitychange', update);
+  }, []);
+
+  useEffect(() => {
+    if (!playing) return;
     const timer = setInterval(() => {
-      if (!document.hidden) setActive((value) => (value + 1) % slides.length);
-    }, 8500);
+      if (document.hidden) return;
+      setPlayback((current) =>
+        current.secondsLeft > 1
+          ? { ...current, secondsLeft: current.secondsLeft - 1 }
+          : {
+              active: (current.active + 1) % slides.length,
+              secondsLeft: SLIDE_SECONDS,
+            },
+      );
+    }, 1000);
     return () => clearInterval(timer);
-  }, [paused, hover, reduced]);
+  }, [active, playing]);
 
   const move = (direction) =>
-    setActive((value) => (value + direction + slides.length) % slides.length);
+    setPlayback((current) => ({
+      active: (current.active + direction + slides.length) % slides.length,
+      secondsLeft: SLIDE_SECONDS,
+    }));
   return (
     <section
-      className={`hero hero-${slide.type}`}
+      className={`hero hero-${slide.type}${playing ? '' : ' hero-paused'}`}
       aria-label="ImperioSur, cerveza artesanal"
       aria-roledescription="carrusel"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      style={{ '--slide-duration': `${SLIDE_SECONDS}s` }}
     >
       <div className="hero-landscape">
         <Image
-          src="/images/hero-rio.png"
-          alt="Una pinta de cerveza dorada junto al río al atardecer"
+          src="/images/hero-rio-4k.webp"
+          alt="Una pinta junto al río con la corona y el nombre ImperioSur tallados en el vidrio"
           fill
           loading="eager"
           fetchPriority="high"
-          sizes="100vw"
+          sizes="(max-width: 767px) max(110vw, 880px), 110vw"
           quality={90}
         />
       </div>
@@ -131,7 +154,7 @@ export default function Hero() {
           </button>
           <span className="slide-index">
             0{active + 1}
-            <span> / 03</span>
+            <span> / 0{slides.length}</span>
           </span>
           <button
             className="slide-arrow"
@@ -144,7 +167,7 @@ export default function Hero() {
           <button
             className="pause-slider"
             type="button"
-            onClick={() => setPaused(!paused)}
+            onClick={() => setPaused((value) => !value)}
             aria-label={paused ? 'Reanudar carrusel' : 'Pausar carrusel'}
             aria-pressed={paused}
           >
