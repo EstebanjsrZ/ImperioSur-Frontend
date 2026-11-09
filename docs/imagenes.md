@@ -29,3 +29,9 @@ Prompt común, con las sustituciones indicadas abajo:
 | imperiosur-stout.png | STOUT | charcoal black |
 
 La marca de navegación y el favicon se construyeron como texto y SVG propios para mantener legibilidad y escalabilidad.
+
+### Portada con el vaso de ImperioSur
+
+`public/images/hero-rio-4k.webp` se generó con ImageGen a partir de la portada anterior y se exportó a WebP de 3840 × 2160 para pantallas grandes. El tamaño final se obtuvo al ampliar la imagen generada.
+
+Instrucción de edición: conservar el encuadre 16:9, el vaso completo y retirado, la corona y el nombre «ImperioSur» grabados, la baranda, el río y el atardecer. Mejorar el detalle del grabado, la espuma, la condensación y la madera. Mantener el espacio oscuro a la izquierda para el título.

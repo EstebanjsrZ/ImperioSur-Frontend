@@ -53,9 +53,9 @@ export default function AuthProvider({ children }) {
       revision.current++;
     };
   }, [verificar]);
-  async function ingresar(credenciales) {
+  async function iniciar(endpoint, formulario) {
     ++revision.current;
-    const datos = await solicitarSesion('login', credenciales);
+    const datos = await solicitarSesion(endpoint, formulario);
     setUsuario(datos.usuario);
     setEstado('autenticado');
     setError('');
@@ -69,7 +69,15 @@ export default function AuthProvider({ children }) {
   }
   return (
     <AuthContext.Provider
-      value={{ usuario, estado, error, ingresar, salir, verificar }}
+      value={{
+        usuario,
+        estado,
+        error,
+        ingresar: (datos) => iniciar('login', datos),
+        registrar: (datos) => iniciar('registro', datos),
+        salir,
+        verificar,
+      }}
     >
       {children}
     </AuthContext.Provider>

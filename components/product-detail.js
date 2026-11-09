@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { obtenerProducto } from '@/lib/api';
 import { formatearPrecio, presentarProducto } from '@/lib/productos';
 import ProductImage from './product-image';
+import AgregarCarrito from './agregar-carrito';
 import CatalogStatus from './catalog-status';
 import { Arrow, Crown, Wave } from './icons';
 
@@ -93,9 +94,7 @@ export default function ProductDetail({ id }) {
                   : 'Sin stock por el momento'}
               </span>
             </div>
-            <Link className="button button-red" href="/cervezas">
-              Seguí descubriendo <Arrow />
-            </Link>
+            <AgregarCarrito producto={producto} />
           </div>
         </div>
       )}

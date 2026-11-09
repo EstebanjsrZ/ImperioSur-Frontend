@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '@/lib/login-schema';
 import { useAuth } from './auth-provider';
 
-export default function LoginForm() {
+export default function LoginForm({ destino }) {
   const { ingresar, estado } = useAuth();
   const router = useRouter();
   const {
@@ -20,12 +20,12 @@ export default function LoginForm() {
     defaultValues: { username: '', password: '' },
   });
   useEffect(() => {
-    if (estado === 'autenticado') router.replace('/cuenta');
-  }, [estado, router]);
+    if (estado === 'autenticado') router.replace(destino);
+  }, [destino, estado, router]);
   async function enviar(datos) {
     try {
       await ingresar(datos);
-      router.replace('/cuenta');
+      router.replace(destino);
       router.refresh();
     } catch (error) {
       for (const campo of ['username', 'password']) {

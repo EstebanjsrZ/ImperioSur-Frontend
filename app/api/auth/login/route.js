@@ -1,8 +1,6 @@
-import { cookies } from 'next/headers';
 import { loginSchema } from '@/lib/login-schema';
 import {
-  cookieOptions,
-  SESSION_COOKIE,
+  iniciarSesion,
   pedirAuth,
   mismoOrigen,
   jsonPrivado,
@@ -36,17 +34,7 @@ export async function POST(request) {
         response.status === 429 ? 429 : 502,
       );
     }
-    if (
-      typeof body.token !== 'string' ||
-      !body.token ||
-      !body.usuario?.username
-    )
-      return jsonPrivado(
-        { detail: 'La API devolvió una sesión inválida.' },
-        502,
-      );
-    (await cookies()).set(SESSION_COOKIE, body.token, cookieOptions);
-    return jsonPrivado({ usuario: body.usuario });
+    return await iniciarSesion(body);
   } catch {
     return jsonPrivado(
       { detail: 'No pudimos conectar con el servidor. Intentá nuevamente.' },

@@ -48,8 +48,8 @@ export default function Home() {
       <section className="manifesto" id="esencia">
         <div className="manifesto-picture" data-reveal>
           <Image
-            src="/images/hero-rio.png"
-            alt="La cerveza artesanal como parte de un encuentro al aire libre"
+            src="/images/hero-rio-corona-tallada.png"
+            alt="Vaso con la corona y el nombre ImperioSur tallados en el vidrio"
             fill
             sizes="(max-width: 800px) 100vw, 50vw"
           />
@@ -111,7 +111,12 @@ export default function Home() {
         </div>
       </section>
       <section className="final-banner">
-        <Image src="/images/hero-rio.png" alt="" fill sizes="100vw" />
+        <Image
+          src="/images/hero-rio-corona-tallada.png"
+          alt=""
+          fill
+          sizes="100vw"
+        />
         <div className="picture-shade" />
         <div data-reveal>
           <p className="eyebrow">LO ARTESANAL SE DISFRUTA MEJOR ACOMPAÑADO</p>
