@@ -1,0 +1,78 @@
+.gestion h1 {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+}
+
+.gestion > p,
+.gestion > .button {
+  margin-top: 1rem;
+}
+
+.gestion-nav,
+.gestion-acciones,
+.gestion-barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gestion-barra {
+  justify-content: space-between;
+}
+
+.gestion-nav {
+  margin-block: 1rem;
+}
+
+.gestion-nav a {
+  text-decoration: underline;
+}
+
+.gestion-lista {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.gestion-lista li {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+
+.gestion-form {
+  max-width: 38rem;
+}
+
+.gestion-campo,
+.gestion-confirmar {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.gestion-form select,
+.gestion-form textarea {
+  width: 100%;
+  border: 1px solid #86776d;
+  border-radius: 6px;
+  padding: 0.75rem;
+  background: white;
+  color: var(--ink);
+}
+
+.gestion-form .gestion-acciones {
+  margin-top: 1rem;
+}
+
+.gestion-form button {
+  margin-top: 0;
+}
+
+.gestion-error {
+  color: var(--red);
+}
+
+.gestion button:disabled {
+  opacity: 0.6;
+}
