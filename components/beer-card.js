@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Arrow, Crown } from './icons';
 import ProductImage from './product-image';
+import AgregarCarrito from './agregar-carrito';
 import { formatearPrecio, presentarProducto } from '@/lib/productos';
 
 export default function BeerCard({ producto, index = 0 }) {
@@ -50,6 +51,9 @@ export default function BeerCard({ producto, index = 0 }) {
         <Link className="text-link" href={href}>
           CONOCELA <Arrow />
         </Link>
+        <div className="mt-4">
+          <AgregarCarrito producto={cerveza} />
+        </div>
       </div>
     </article>
   );

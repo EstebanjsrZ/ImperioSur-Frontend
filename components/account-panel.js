@@ -50,6 +50,11 @@ export default function AccountPanel({ puedeGestionar }) {
       <h1>MI CUENTA</h1>
       <p>Hola, {usuario.nombre || usuario.username}.</p>
       <p>Tu sesión está activa.</p>
+      <p>
+        <Link className="button button-outline" href="/cuenta/pedidos">
+          Mis pedidos
+        </Link>
+      </p>
       {puedeGestionar && (
         <p>
           <Link className="button button-outline" href="/gestion">
