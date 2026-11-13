@@ -10,7 +10,7 @@ export default function CatalogStatus({ error, cargando = false, onRetry }) {
       </h2>
       <p>
         {cargando
-          ? 'Estamos buscando tus próximas ImperioSur.'
+          ? 'Estamos cargando las cervezas. Esto puede tardar un minuto.'
           : error || 'Todavía no hay productos cargados en nuestro catálogo.'}
       </p>
       {onRetry && (

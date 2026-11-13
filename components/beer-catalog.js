@@ -18,7 +18,9 @@ export default function BeerCatalog({ featured = false }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setBusquedaAplicada(busqueda.trim());
-      setConsulta((actual) => ({ ...actual, pagina: 1 }));
+      setConsulta((actual) =>
+        actual.pagina === 1 ? actual : { ...actual, pagina: 1 },
+      );
     }, 300);
     return () => clearTimeout(timer);
   }, [busqueda]);
